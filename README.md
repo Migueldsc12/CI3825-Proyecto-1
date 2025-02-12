@@ -79,6 +79,6 @@ Esto iniciará un intérprete de comandos donde se pueden ejecutar los siguiente
 
 ## ✍️ **Autores**
 - **Eliezer Cario - 18-10605**
-- **Miguel  - agrega aqui el carné y apellido xd**
+- **Miguel Salomon - 19-10274**
 
 ---

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "node.h"
+#include "include/node.h"
 
 // Definición de la estructura de nodo (estructura opaca)
 struct nodeStruct {
@@ -32,6 +32,23 @@ Node* create_node(const char *name, NodeType type, Node *parent) {
     new_node->sibling = NULL;
 
     return new_node;
+}
+
+// Busca un nodo por su nombre y tipo en el árbol
+Node* find_node(Node *root, const char *name, NodeType type) {
+    if (!root || !name) return NULL;
+
+    // Verifica si el nodo actual coincide con el nombre y tipo buscado
+    if (strcmp(root->name, name) == 0 && root->type == type) {
+        return root;
+    }
+
+    // Busca en los hijos del nodo actual
+    Node *found = find_node(root->child, name, type);
+    if (found) return found;
+
+    // Busca en los hermanos del nodo actual
+    return find_node(root->sibling, name, type);
 }
 
 void add_child(Node *parent, Node *child) {

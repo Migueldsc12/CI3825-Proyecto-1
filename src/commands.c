@@ -28,8 +28,6 @@ FileSystem* init_filesystem() {
 bool touch(FileSystem *fs, const char *path) {
     if (!fs || !path) return false;
 
-    if (!fs || !path) return false;
-
     // Verifica si el archivo ya existe
     Node *existing_node = find_node(fs->current_dir, path, FILE_TYPE);
     if (existing_node) {

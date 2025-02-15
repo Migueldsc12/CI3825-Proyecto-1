@@ -12,6 +12,8 @@ typedef enum {
     DIR_TYPE
 } NodeType;
 
+Node* find_node(Node *root, const char *name, NodeType type);
+
 // Funciones para manipulación de nodos
 Node* create_node(const char *name, NodeType type, Node *parent);
 void add_child(Node *parent, Node *child);

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "include/node.h"
+#include <time.h>
 
 // Definición de la estructura de nodo (estructura opaca)
 struct nodeStruct
@@ -11,6 +12,7 @@ struct nodeStruct
     Node *parent;
     Node *child;
     Node *sibling;
+    time_t creation_time; 
 };
 
 Node *create_node(const char *name, NodeType type, Node *parent)
@@ -34,6 +36,7 @@ Node *create_node(const char *name, NodeType type, Node *parent)
     new_node->parent = parent;
     new_node->child = NULL;
     new_node->sibling = NULL;
+    new_node->creation_time = time(NULL); 
 
     return new_node;
 }
@@ -171,11 +174,18 @@ Node *find_immediate_child(Node *parent, const char *name)
     return NULL;
 }
 
+// Función auxiliar para formatear la fecha y hora
+void format_time(char *buffer, size_t buffer_size, time_t timestamp) 
+{
+    struct tm *timeinfo = localtime(&timestamp);
+    strftime(buffer, buffer_size, "%H:%M-%d/%m/%Y", timeinfo);
+}
+
 // Función auxiliar que recorre el árbol en preorden y escribe cada nodo.
 // parent_path: camino absoluto del nodo padre. Para la raíz se pasa cadena vacía.
 void write_preorder(FILE *file, const Node *node, const char *parent_path)
 {
-    if (!node)
+    if (!node || !file)
         return;
 
     char abs_path[1024];
@@ -193,8 +203,10 @@ void write_preorder(FILE *file, const Node *node, const char *parent_path)
             snprintf(abs_path, sizeof(abs_path), "%s/%s", parent_path, node->name);
     }
 
-    // Fecha de creación ficticia hay que agregar a la estructura del nodo, pero esto es para pruebas
-    const char *creation_date = "00:00-00/00/0000";
+    // Formatear la fecha y hora de creación
+    char creation_date[20];
+    format_time(creation_date, sizeof(creation_date), node->creation_time);
+
     // Tipo: 'D' para directorio, 'F' para archivo.
     char type_letter = (node->type == DIR_TYPE) ? 'D' : 'F';
 

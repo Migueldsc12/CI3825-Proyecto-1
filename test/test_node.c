@@ -1,6 +1,7 @@
 #include "../src/include/node.h"
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 // Prueba para create_node
 void test_create_node() {

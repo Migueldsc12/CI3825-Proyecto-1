@@ -159,6 +159,18 @@ bool cd(FileSystem *fs, const char *path)
     if (!fs || !path)
         return false;
 
+        // Caso especial: "cd .." para retroceder al directorio padre
+    if (strcmp(path, "..") == 0) 
+    {
+        Node *parent = get_parent(fs->current_dir);
+        if (!parent) {
+            fprintf(stderr, "Error: No hay directorio padre (ya estás en la raíz).\n");
+            return false;
+        }
+        fs->current_dir = parent;
+        return true;
+    }
+
     // Busca el directorio
     Node *target_dir = find_node(fs->current_dir, path, DIR_TYPE);
 
@@ -173,10 +185,8 @@ bool cd(FileSystem *fs, const char *path)
 }
 
 // Imprime la ruta absoluta del directorio actual
-void pwd(const FileSystem *fs)
-{
-    if (!fs)
-        return;
+void pwd(const FileSystem *fs) {
+    if (!fs) return;
 
     // Construye la ruta absoluta recorriendo los padres
     char path[1024] = "";
@@ -185,7 +195,22 @@ void pwd(const FileSystem *fs)
     while (current)
     {
         char temp[1024];
-        snprintf(temp, sizeof(temp), "/%s%s", get_node_name(current), path);
+
+        if (get_parent(current) == NULL)
+        {
+            // Si es la raíz, solo agregamos "/"
+            snprintf(temp, sizeof(temp), "/%s", path);
+        } 
+        else if (get_parent(get_parent(current)) == NULL) 
+        {
+            // Si es un hijo directo de la raíz, no agregamos "/" adicional
+            snprintf(temp, sizeof(temp), "%s%s", get_node_name(current), path);
+        } 
+        else 
+        {
+            // Si no es la raíz ni un hijo directo de la raíz, agregamos "/<nombre>"
+            snprintf(temp, sizeof(temp), "/%s%s", get_node_name(current), path);
+        }
         strcpy(path, temp);
         current = get_parent(current);
     }

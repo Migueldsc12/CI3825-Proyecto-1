@@ -142,8 +142,17 @@ void ls(const FileSystem *fs, const char *path, bool long_listing)
     {
         if (long_listing)
         {
-            printf("%s (%s)\n", get_node_name(child),
-                   get_node_type(child) == DIR_TYPE ? "DIR" : "FILE");
+            // Formatear la fecha y hora de creación
+            char time_str[20];
+            time_t creation_time = get_creation_time(child);
+            struct tm *timeinfo = localtime(&creation_time);
+            strftime(time_str, sizeof(time_str), "%H:%M-%d/%m/%Y", timeinfo);
+
+            // Imprimir detalles adicionales (nombre, tipo, fecha de creación)
+            printf("%s\t%s\t%s\n", 
+                   get_node_name(child),
+                   (get_node_type(child) == DIR_TYPE ? "DIR" : "FILE"),
+                   time_str);
         }
         else
         {

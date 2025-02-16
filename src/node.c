@@ -174,6 +174,11 @@ Node *find_immediate_child(Node *parent, const char *name)
     return NULL;
 }
 
+time_t get_creation_time(const Node *node) {
+    if (!node) return 0;
+    return node->creation_time;
+}
+
 // Función auxiliar para formatear la fecha y hora
 void format_time(char *buffer, size_t buffer_size, time_t timestamp) 
 {

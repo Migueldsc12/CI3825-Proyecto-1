@@ -1,14 +1,16 @@
 #include "include/commands.h"
-#include "node.h"
+#include "include/node.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 // Inicializa el sistema de archivos con la raíz "/"
-FileSystem* init_filesystem() {
+FileSystem *init_filesystem()
+{
     FileSystem *fs = (FileSystem *)malloc(sizeof(FileSystem));
-    if (!fs) {
+    if (!fs)
+    {
         perror("Error al asignar memoria para el sistema de archivos");
         return NULL;
     }
@@ -16,7 +18,8 @@ FileSystem* init_filesystem() {
     fs->root = create_node("/", DIR_TYPE, NULL);
     fs->current_dir = fs->root;
 
-    if (!fs->root) {
+    if (!fs->root)
+    {
         free(fs);
         return NULL;
     }
@@ -25,51 +28,62 @@ FileSystem* init_filesystem() {
 }
 
 // Crea un archivo en la ruta especificada
-bool touch(FileSystem *fs, const char *path) {
-    if (!fs || !path) return false;
+bool touch(FileSystem *fs, const char *path)
+{
+    if (!fs || !path)
+        return false;
 
     // Verifica si el archivo ya existe
     Node *existing_node = find_node(fs->current_dir, path, FILE_TYPE);
-    if (existing_node) {
+    if (existing_node)
+    {
         fprintf(stderr, "Error: El archivo '%s' ya existe.\n", path);
         return false;
     }
 
     // Crea el archivo
     Node *new_file = create_node(path, FILE_TYPE, fs->current_dir);
-    if (!new_file) return false;
+    if (!new_file)
+        return false;
 
     add_child(fs->current_dir, new_file);
     return true;
 }
 
 // Crea un directorio en la ruta especificada
-bool mkdir(FileSystem *fs, const char *path) {
-    if (!fs || !path) return false;
+bool mkdir(FileSystem *fs, const char *path)
+{
+    if (!fs || !path)
+        return false;
 
-     // Verifica si el directorio ya existe
+    // Verifica si el directorio ya existe
     Node *existing_node = find_node(fs->current_dir, path, DIR_TYPE);
-    if (existing_node) {
+    if (existing_node)
+    {
         fprintf(stderr, "Error: El directorio '%s' ya existe.\n", path);
         return false;
     }
 
     // Crea el directorio
     Node *new_dir = create_node(path, DIR_TYPE, fs->current_dir);
-    if (!new_dir) return false;
+    if (!new_dir)
+        return false;
 
     add_child(fs->current_dir, new_dir);
     return true;
 }
 
 // Elimina un archivo en la ruta especificada
-bool rm(FileSystem *fs, const char *path) {
-    if (!fs || !path) return false;
+bool rm(FileSystem *fs, const char *path)
+{
+    if (!fs || !path)
+        return false;
 
     // Busca el archivo en el árbol
     Node *file_to_remove = find_node(fs->current_dir, path, FILE_TYPE);
 
-    if (!file_to_remove || get_node_type(file_to_remove) != FILE_TYPE) {
+    if (!file_to_remove || get_node_type(file_to_remove) != FILE_TYPE)
+    {
         fprintf(stderr, "Error: El archivo no existe o es un directorio.\n");
         return false;
     }
@@ -79,19 +93,23 @@ bool rm(FileSystem *fs, const char *path) {
 }
 
 // Elimina un directorio vacío en la ruta especificada
-bool rmdir(FileSystem *fs, const char *path) {
-    if (!fs || !path) return false;
+bool rmdir(FileSystem *fs, const char *path)
+{
+    if (!fs || !path)
+        return false;
 
     // Busca el directorio en el árbol
     Node *dir_to_remove = find_node(fs->current_dir, path, DIR_TYPE);
 
-    if (!dir_to_remove || get_node_type(dir_to_remove) != DIR_TYPE) {
+    if (!dir_to_remove || get_node_type(dir_to_remove) != DIR_TYPE)
+    {
         fprintf(stderr, "Error: El directorio no existe o no está vacío.\n");
         return false;
     }
 
     // Verifica que el directorio esté vacío
-    if (get_first_child(dir_to_remove)) {
+    if (get_first_child(dir_to_remove))
+    {
         fprintf(stderr, "Error: El directorio no está vacío.\n");
         return false;
     }
@@ -101,26 +119,34 @@ bool rmdir(FileSystem *fs, const char *path) {
 }
 
 // Lista los archivos y directorios en la ruta especificada
-void ls(const FileSystem *fs, const char *path, bool long_listing) {
-    if (!fs) return;
+void ls(const FileSystem *fs, const char *path, bool long_listing)
+{
+    if (!fs)
+        return;
 
     Node *target_dir = fs->current_dir;
 
     // Si se especifica un path, buscar el directorio correspondiente
-    if (path) {
+    if (path)
+    {
         target_dir = find_node(fs->current_dir, path, DIR_TYPE);
-        if (!target_dir) {
+        if (!target_dir)
+        {
             fprintf(stderr, "Error: El directorio '%s' no existe.\n", path);
             return;
         }
     }
 
     Node *child = get_first_child(target_dir);
-    while (child) {
-        if (long_listing) {
+    while (child)
+    {
+        if (long_listing)
+        {
             printf("%s (%s)\n", get_node_name(child),
                    get_node_type(child) == DIR_TYPE ? "DIR" : "FILE");
-        } else {
+        }
+        else
+        {
             printf("%s\n", get_node_name(child));
         }
         child = get_next_sibling(child);
@@ -128,13 +154,16 @@ void ls(const FileSystem *fs, const char *path, bool long_listing) {
 }
 
 // Cambia el directorio actual
-bool cd(FileSystem *fs, const char *path) {
-    if (!fs || !path) return false;
+bool cd(FileSystem *fs, const char *path)
+{
+    if (!fs || !path)
+        return false;
 
     // Busca el directorio
     Node *target_dir = find_node(fs->current_dir, path, DIR_TYPE);
 
-    if (!target_dir || get_node_type(target_dir) != DIR_TYPE) {
+    if (!target_dir || get_node_type(target_dir) != DIR_TYPE)
+    {
         fprintf(stderr, "Error: El directorio no existe.\n");
         return false;
     }
@@ -144,14 +173,17 @@ bool cd(FileSystem *fs, const char *path) {
 }
 
 // Imprime la ruta absoluta del directorio actual
-void pwd(const FileSystem *fs) {
-    if (!fs) return;
+void pwd(const FileSystem *fs)
+{
+    if (!fs)
+        return;
 
     // Construye la ruta absoluta recorriendo los padres
     char path[1024] = "";
     Node *current = fs->current_dir;
 
-    while (current) {
+    while (current)
+    {
         char temp[1024];
         snprintf(temp, sizeof(temp), "/%s%s", get_node_name(current), path);
         strcpy(path, temp);
@@ -162,24 +194,28 @@ void pwd(const FileSystem *fs) {
 }
 
 // Guarda el sistema de archivos en un archivo de texto
-bool wrts(const FileSystem *fs, const char *output_file) {
-    if (!fs || !output_file) return false;
+bool wrts(const FileSystem *fs, const char *output_file)
+{
+    if (!fs || !output_file)
+        return false;
 
     FILE *file = fopen(output_file, "w");
-    if (!file) {
+    if (!file)
+    {
         perror("Error al abrir el archivo");
         return false;
     }
 
-    // Recorre el árbol en preorden y escribe los nodos en el archivo
-    // (Implementar lógica de recorrido y escritura)
+    // Se recorre el árbol en preorden, iniciando en la raíz.
+    write_preorder(file, fs->root, "");
 
     fclose(file);
     return true;
 }
 
 // Muestra una lista de comandos disponibles
-void help() {
+void help()
+{
     printf("Comandos disponibles:\n");
     printf("  touch <nombre_archivo> - Crea un archivo.\n");
     printf("  mkdir <nombre_directorio> - Crea un directorio.\n");
@@ -194,8 +230,10 @@ void help() {
 }
 
 // Libera la memoria del sistema de archivos
-void exit_filesystem(FileSystem *fs) {
-    if (!fs) return;
+void exit_filesystem(FileSystem *fs)
+{
+    if (!fs)
+        return;
 
     free_tree(fs->root);
     free(fs);

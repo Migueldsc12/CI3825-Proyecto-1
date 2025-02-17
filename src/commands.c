@@ -149,7 +149,7 @@ void ls(const FileSystem *fs, const char *path, bool long_listing)
             strftime(time_str, sizeof(time_str), "%H:%M-%d/%m/%Y", timeinfo);
 
             // Imprimir detalles adicionales (nombre, tipo, fecha de creación)
-            printf("%s\t%s\t%s\n", 
+            printf("%s\t%s\t%s\n",
                    get_node_name(child),
                    (get_node_type(child) == DIR_TYPE ? "DIR" : "FILE"),
                    time_str);
@@ -168,15 +168,23 @@ bool cd(FileSystem *fs, const char *path)
     if (!fs || !path)
         return false;
 
-        // Caso especial: "cd .." para retroceder al directorio padre
-    if (strcmp(path, "..") == 0) 
+    // Caso especial: "cd .." para retroceder al directorio padre
+    if (strcmp(path, "..") == 0)
     {
         Node *parent = get_parent(fs->current_dir);
-        if (!parent) {
+        if (!parent)
+        {
             fprintf(stderr, "Error: No hay directorio padre (ya estás en la raíz).\n");
             return false;
         }
         fs->current_dir = parent;
+        return true;
+    }
+
+    // Caso especial: "cd ." para ir a la raíz
+    if (strcmp(path, ".") == 0)
+    {
+        fs->current_dir = fs->root;
         return true;
     }
 
@@ -194,8 +202,10 @@ bool cd(FileSystem *fs, const char *path)
 }
 
 // Imprime la ruta absoluta del directorio actual
-void pwd(const FileSystem *fs) {
-    if (!fs) return;
+void pwd(const FileSystem *fs)
+{
+    if (!fs)
+        return;
 
     // Construye la ruta absoluta recorriendo los padres
     char path[1024] = "";
@@ -209,13 +219,13 @@ void pwd(const FileSystem *fs) {
         {
             // Si es la raíz, solo agregamos "/"
             snprintf(temp, sizeof(temp), "/%s", path);
-        } 
-        else if (get_parent(get_parent(current)) == NULL) 
+        }
+        else if (get_parent(get_parent(current)) == NULL)
         {
             // Si es un hijo directo de la raíz, no agregamos "/" adicional
             snprintf(temp, sizeof(temp), "%s%s", get_node_name(current), path);
-        } 
-        else 
+        }
+        else
         {
             // Si no es la raíz ni un hijo directo de la raíz, agregamos "/<nombre>"
             snprintf(temp, sizeof(temp), "/%s%s", get_node_name(current), path);
@@ -255,7 +265,7 @@ void help()
     printf("  mkdir <nombre_directorio> - Crea un directorio.\n");
     printf("  rm <nombre_archivo> - Elimina un archivo.\n");
     printf("  rmdir <nombre_directorio> - Elimina un directorio vacío.\n");
-    printf("  ls [<nombre_directorio>] - Lista archivos y directorios.\n");
+    printf("  ls [-l] <nombre_directorio> - Lista archivos y directorios. Cuando se usa la opción -l se listan los elementos del directorio dado mostrando: nombre fecha de creación y si es un archivo o directorio\n");
     printf("  cd <nombre_directorio> - Cambia el directorio actual.\n");
     printf("  pwd - Muestra la ruta absoluta del directorio actual.\n");
     printf("  wrts <nombre_archivo> - Guarda el sistema de archivos en un archivo.\n");

@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <time.h>
 
 // Definición opaca de la estructura nodeStruct
 typedef struct nodeStruct Node;
@@ -14,6 +15,8 @@ typedef enum {
 } NodeType;
 
 Node* find_node(Node *root, const char *name, NodeType type);
+
+time_t get_creation_time(const Node *node);
 
 // Funciones para manipulación de nodos
 Node* create_node(const char *name, NodeType type, Node *parent);

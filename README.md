@@ -15,11 +15,9 @@ CI3825-Proyecto-1/
 │   │── main.c         # Punto de entrada del programa
 │   │── node.c         # Implementación de nodos del sistema de archivos
 │   │── commands.c     # Implementación de los comandos UNIX
-│   │── filesystem.c   # Funciones de gestión del sistema de archivos
 │   ├── include/       # Archivos de cabecera
 │   │   │── node.h
 │   │   │── commands.h
-│   │   │── filesystem.h
 │── test/              # Pruebas
 │── Makefile           # Archivo para compilar el proyecto
 │── README.md          
@@ -54,7 +52,7 @@ make clean
 Después de compilar, ejecuta el simulador con:
 
 ```sh
-./simfs
+./bin/simfs
 ```
 
 Esto iniciará un intérprete de comandos donde se pueden ejecutar los siguientes comandos:
@@ -65,7 +63,7 @@ Esto iniciará un intérprete de comandos donde se pueden ejecutar los siguiente
 | `mkdir <directorio>` | Crea un directorio en el directorio actual. |
 | `rm <archivo>` | Elimina un archivo. |
 | `rmdir <directorio>` | Elimina un directorio vacío. |
-| `ls [-l]` | Lista los archivos y directorios. |
+| `ls [-l] <directorio>` | Lista los archivos y directorios del directorio dado. Usa -l para más información |
 | `cd <directorio>` | Cambia al directorio indicado. |
 | `pwd` | Muestra el directorio actual. |
 | `wrts <archivo>` | Guarda la estructura del sistema de archivos en un archivo. |

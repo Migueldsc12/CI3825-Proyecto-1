@@ -38,36 +38,45 @@ void load_filesystem_from_file(FileSystem *fs, const char *filename)
         char typeChar = token[0];
         NodeType type = (typeChar == 'D') ? DIR_TYPE : FILE_TYPE;
 
-        // Procesar el camino: se asume que es absoluto (comienza con '/')
+        // Procesar el camino: es absoluto por lo tanto comienza con '/'
         char *path_copy = strdup(path);
+        if (!path_copy)
+            continue;
         char *saveptr;
+        // Extraer todos los componentes)en un arreglo.
+        char *parts[100]; // Suponemos un máximo de 100 componentes.
+        int count = 0;
         char *part = strtok_r(path_copy, "/", &saveptr);
-        Node *current = fs->root; // Comenzamos en la raíz
-
-        while (part != NULL)
+        while (part != NULL && count < 100)
         {
-            char *next = strtok_r(NULL, "/", &saveptr);
-            if (next == NULL)
+            parts[count++] = part;
+            part = strtok_r(NULL, "/", &saveptr);
+        }
+
+        // Recorremos los componentes para ubicar o crear cada nodo.
+        Node *current = fs->root; // Comenzamos en la raíz.
+        for (int i = 0; i < count; i++)
+        {
+            if (i == count - 1)
             {
-                // Última parte: insertar el nodo (archivo o directorio) si no existe
-                if (!find_immediate_child(current, part))
+                // Última parte: se crea el nodo con el tipo especificado (archivo o directorio)
+                if (!find_immediate_child(current, parts[i]))
                 {
-                    Node *new_node = create_node(part, type, current);
+                    Node *new_node = create_node(parts[i], type, current);
                     add_child(current, new_node);
                 }
             }
             else
             {
-                // Parte intermedia: debe existir o crearse como directorio
-                Node *next_dir = find_immediate_child(current, part);
+                // Parte intermedia: debe ser directorio.
+                Node *next_dir = find_immediate_child(current, parts[i]);
                 if (!next_dir)
                 {
-                    next_dir = create_node(part, DIR_TYPE, current);
+                    next_dir = create_node(parts[i], DIR_TYPE, current);
                     add_child(current, next_dir);
                 }
                 current = next_dir;
             }
-            part = strtok_r(NULL, "/", &saveptr);
         }
         free(path_copy);
     }
@@ -99,14 +108,14 @@ int main(int argc, char *argv[])
     fs->current_dir = fs->root;
 
     char input[MAX_CMD];
-    printf("simfs> ");
+    printf("> ");
     while (fgets(input, sizeof(input), stdin))
     {
         // Eliminar el salto de línea
         input[strcspn(input, "\n")] = '\0';
         if (strlen(input) == 0)
         {
-            printf("simfs> ");
+            printf("> ");
             continue;
         }
 
@@ -114,7 +123,7 @@ int main(int argc, char *argv[])
         char *command = strtok(input, " ");
         if (!command)
         {
-            printf("simfs> ");
+            printf("> ");
             continue;
         }
 
@@ -225,7 +234,7 @@ int main(int argc, char *argv[])
             printf("Comando desconocido. Escriba 'help' para ver los comandos disponibles.\n");
         }
 
-        printf("simfs> ");
+        printf("> ");
     }
 
     exit_filesystem(fs);

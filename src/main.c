@@ -40,49 +40,46 @@ void load_filesystem_from_file(FileSystem *fs, const char *filename)
 
         // Procesar el camino: es absoluto por lo tanto comienza con '/'
         char *path_copy = strdup(path);
-        if (!path_copy)
+        if (!path_copy) 
             continue;
-        char *saveptr;
-        // Extraer todos los componentes)en un arreglo.
-        char *parts[100]; // Suponemos un máximo de 100 componentes.
-        int count = 0;
-        char *part = strtok_r(path_copy, "/", &saveptr);
-        while (part != NULL && count < 100)
-        {
-            parts[count++] = part;
-            part = strtok_r(NULL, "/", &saveptr);
-        }
 
-        // Recorremos los componentes para ubicar o crear cada nodo.
-        Node *current = fs->root; // Comenzamos en la raíz.
-        for (int i = 0; i < count; i++)
+        // Procesar la ruta componente por componente
+        Node *current = fs->root; // Comenzamos en la raíz
+        char *saveptr;
+        char *part = strtok_r(path_copy, "/", &saveptr);
+        char *next_part = strtok_r(NULL, "/", &saveptr);
+
+        while (part != NULL) 
         {
-            if (i == count - 1)
+            if (next_part == NULL) 
             {
                 // Última parte: se crea el nodo con el tipo especificado (archivo o directorio)
-                if (!find_immediate_child(current, parts[i]))
+                if (!find_immediate_child(current, part)) 
                 {
-                    Node *new_node = create_node(parts[i], type, current);
+                    Node *new_node = create_node(part, type, current);
                     add_child(current, new_node);
                 }
-            }
-            else
+            } 
+            else 
             {
-                // Parte intermedia: debe ser directorio.
-                Node *next_dir = find_immediate_child(current, parts[i]);
-                if (!next_dir)
+                // Parte intermedia: debe ser directorio
+                Node *next_dir = find_immediate_child(current, part);
+                if (!next_dir) 
                 {
-                    next_dir = create_node(parts[i], DIR_TYPE, current);
+                    next_dir = create_node(part, DIR_TYPE, current);
                     add_child(current, next_dir);
                 }
                 current = next_dir;
             }
+            part = next_part;
+            next_part = strtok_r(NULL, "/", &saveptr);
         }
         free(path_copy);
     }
     fclose(fp);
 }
 
+//Funcion principal del programa
 int main(int argc, char *argv[])
 {
     FileSystem *fs = init_filesystem();
